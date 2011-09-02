@@ -2,7 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
-	<classpathentry kind="lib" path="lib/google-collections/google-collect-1.0.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER" exported="true"/>
+	<classpathentry sourcepath="/home/tdenley/.gradle/cache/com.google.guava/guava/sources/guava-r06-sources.jar" kind="lib" path="/home/tdenley/.gradle/cache/com.google.guava/guava/jars/guava-r06.jar" exported="true"/>
+	<classpathentry sourcepath="/home/tdenley/.gradle/cache/junit/junit-dep/sources/junit-dep-4.9-sources.jar" kind="lib" path="/home/tdenley/.gradle/cache/junit/junit-dep/jars/junit-dep-4.9.jar" exported="true"/>
+	<classpathentry kind="lib" path="/home/tdenley/.gradle/cache/org.hamcrest/hamcrest-all/jars/hamcrest-all-1.2.jar" exported="true"/>
 </classpath>
