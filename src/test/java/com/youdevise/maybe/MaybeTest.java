@@ -45,11 +45,11 @@ public class MaybeTest {
     }
 
     @Test
-    public void unknownValuesAreNeverEqual() throws Exception {
-        assertThat(unknown(), not(equalTo(unknown())));
+    public void unknownValuesAreEqual() throws Exception {
+        assertThat(unknown(), equalTo(unknown()));
 
         Maybe<Object> u = unknown();
-        assertThat(u, not(equalTo(u)));
+        assertThat(u, equalTo(u));
     }
 
     @Test

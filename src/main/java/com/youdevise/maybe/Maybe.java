@@ -94,7 +94,7 @@ public abstract class Maybe<T> implements Iterable<T> {
 
         @Override
         public boolean equals(Object obj) {
-            return false;
+            return (obj instanceof UnknownValue);
         }
 
         @Override
