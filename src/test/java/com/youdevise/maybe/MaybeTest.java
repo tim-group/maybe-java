@@ -76,9 +76,9 @@ public class MaybeTest {
 
     @Test
     public void transforming() throws Exception {
-        assertThat(new Customer("alice@example.com").emailAddress().to(toUpperCase).otherwise("nobody@example.com"),
+        assertThat(new Customer("alice@example.com").emailAddress().transform(toUpperCase).otherwise("nobody@example.com"),
                 equalTo("ALICE@EXAMPLE.COM"));
-        assertThat(new Customer().emailAddress().to(toUpperCase).otherwise("UNKNOWN"),
+        assertThat(new Customer().emailAddress().transform(toUpperCase).otherwise("UNKNOWN"),
                 equalTo("UNKNOWN"));
     }
 

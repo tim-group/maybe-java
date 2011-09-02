@@ -10,8 +10,9 @@ public abstract class Maybe<T> implements Iterable<T> {
     public abstract boolean isKnown();
     public abstract T otherwise(T defaultValue);
     public abstract Maybe<T> otherwise(Maybe<T> maybeDefaultValue);
-    public abstract <U> Maybe<U> to(Function<? super T, ? extends U> mapping);
+    public abstract <U> Maybe<U> transform(Function<? super T, ? extends U> mapping);
     public abstract Maybe<Boolean> query(Predicate<? super T> mapping);
+    public abstract Maybe<T> filter(Predicate<? super T> mapping);
     
     public static <T> Maybe<T> unknown() {
         return new UnknownValue<T>();
@@ -50,13 +51,18 @@ public abstract class Maybe<T> implements Iterable<T> {
         }
 
         @Override
-        public <U> Maybe<U> to(Function<? super T, ? extends U> mapping) {
+        public <U> Maybe<U> transform(Function<? super T, ? extends U> mapping) {
             return unknown();
         }
 
         @Override
         public Maybe<Boolean> query(Predicate<? super T> mapping) {
             return unknown();
+        }
+        
+        @Override
+        public Maybe<T> filter(Predicate<? super T> mapping) {
+            return this;
         }
 
         @Override
@@ -102,13 +108,18 @@ public abstract class Maybe<T> implements Iterable<T> {
         }
 
         @Override
-        public <U> Maybe<U> to(Function<? super T, ? extends U> mapping) {
+        public <U> Maybe<U> transform(Function<? super T, ? extends U> mapping) {
             return definitely((U)mapping.apply(theValue));
         }
 
         @Override
         public Maybe<Boolean> query(Predicate<? super T> mapping) {
             return definitely(mapping.apply(theValue));
+        }
+
+        @Override
+        public Maybe<T> filter(Predicate<? super T> mapping) {
+            return mapping.apply(theValue) ? this : Maybe.<T>unknown();
         }
 
         @Override
