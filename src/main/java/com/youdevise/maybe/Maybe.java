@@ -14,59 +14,60 @@ public abstract class Maybe<T> implements Iterable<T> {
     public abstract Maybe<Boolean> query(Predicate<? super T> mapping);
     
     public static <T> Maybe<T> unknown() {
-        return new Maybe<T>() {
-            @Override
-            public boolean isKnown() {
-                return false;
-            }
-
-            public Iterator<T> iterator() {
-                return Collections.<T>emptyList().iterator();
-            }
-
-            @Override
-            public T otherwise(T defaultValue) {
-                return defaultValue;
-            }
-
-            @Override
-            public Maybe<T> otherwise(Maybe<T> maybeDefaultValue) {
-                return maybeDefaultValue;
-            }
-
-            @Override
-            public <U> Maybe<U> to(Function<? super T, ? extends U> mapping) {
-                return unknown();
-            }
-
-            @Override
-            public Maybe<Boolean> query(Predicate<? super T> mapping) {
-                return unknown();
-            }
-
-            @Override
-            public String toString() {
-                return "unknown";
-            }
-
-            @Override
-            @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
-            public boolean equals(Object obj) {
-                return false;
-            }
-
-            @Override
-            public int hashCode() {
-                return 0;
-            }
-        };
+        return new UnknownValue<T>();
     }
-
+    
     public static <T> Maybe<T> definitely(final T theValue) {
         return new DefiniteValue<T>(theValue);
     }
+    
+    private static final class UnknownValue<T> extends Maybe<T> {
+        @Override
+        public boolean isKnown() {
+            return false;
+        }
 
-    private static class DefiniteValue<T> extends Maybe<T> {
+        public Iterator<T> iterator() {
+            return Collections.<T>emptyList().iterator();
+        }
+
+        @Override
+        public T otherwise(T defaultValue) {
+            return defaultValue;
+        }
+
+        @Override
+        public Maybe<T> otherwise(Maybe<T> maybeDefaultValue) {
+            return maybeDefaultValue;
+        }
+
+        @Override
+        public <U> Maybe<U> to(Function<? super T, ? extends U> mapping) {
+            return unknown();
+        }
+
+        @Override
+        public Maybe<Boolean> query(Predicate<? super T> mapping) {
+            return unknown();
+        }
+
+        @Override
+        public String toString() {
+            return "unknown";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+    }
+
+    private static final class DefiniteValue<T> extends Maybe<T> {
         private final T theValue;
 
         public DefiniteValue(T theValue) {
