@@ -1,7 +1,12 @@
-package com.natpryce.maybe;
+package com.youdevise.maybe;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.youdevise.maybe.Maybe;
+
+import static com.youdevise.maybe.Maybe.definitely;
+import static com.youdevise.maybe.Maybe.unknown;
+
 import org.junit.Test;
 
 import java.util.List;
@@ -11,8 +16,6 @@ import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
-import static com.natpryce.maybe.Maybe.definitely;
-import static com.natpryce.maybe.Maybe.unknown;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;

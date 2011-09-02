@@ -1,4 +1,4 @@
-package com.natpryce.maybe;
+package com.youdevise.maybe;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
