@@ -94,7 +94,7 @@ public abstract class Maybe<T> implements Iterable<T> {
 
         @Override
         public <U> Maybe<U> to(Function<? super T, ? extends U> mapping) {
-            return definitely(mapping.apply(theValue));
+            return definitely((U)mapping.apply(theValue));
         }
 
         @Override
@@ -112,10 +112,9 @@ public abstract class Maybe<T> implements Iterable<T> {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            DefiniteValue that = (DefiniteValue) o;
+            final DefiniteValue<?> that = (DefiniteValue<?>) o;
 
             return theValue.equals(that.theValue);
-
         }
 
         @Override
