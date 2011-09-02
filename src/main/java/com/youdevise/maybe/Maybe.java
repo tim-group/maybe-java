@@ -16,12 +16,6 @@ public abstract class Maybe<T> implements Iterable<T> {
     public abstract Maybe<Boolean> query(Predicate<? super T> mapping);
     public abstract Maybe<T> filter(Predicate<? super T> mapping);
     
-    @Deprecated()
-    public final T get() {
-        return otherwiseThrow(new NullPointerException());
-    }
-    
-    @Deprecated()
     public final boolean isEmpty() {
         return !isKnown();
     }
