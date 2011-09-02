@@ -25,6 +25,10 @@ public abstract class Maybe<T> implements Iterable<T> {
         return new DefiniteValue<T>(theValue);
     }
     
+    public static <T> Maybe<T> possibly(final T theValue) {
+        return (theValue == null) ? Maybe.<T>unknown() : definitely(theValue);
+    }
+    
     private static final class UnknownValue<T> extends Maybe<T> {
         @Override
         public boolean isKnown() {

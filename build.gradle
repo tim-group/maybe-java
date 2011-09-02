@@ -6,7 +6,7 @@ defaultTasks 'clean', 'test', 'jar'
 
 group = "com.youdevise"
 targetCompatibility = 1.5
-version = '1.0'
+version = '1.0.1'
     
 repositories {  
     mavenCentral()
