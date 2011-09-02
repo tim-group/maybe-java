@@ -12,8 +12,19 @@ public abstract class Maybe<T> implements Iterable<T> {
     public abstract T otherwiseThrow(RuntimeException exception);
     public abstract Maybe<T> otherwise(Maybe<T> maybeDefaultValue);
     public abstract <U> Maybe<U> transform(Function<? super T, ? extends U> mapping);
+    public abstract <U> Maybe<U> bind(Function<? super T, Maybe<? extends U>> mapping);
     public abstract Maybe<Boolean> query(Predicate<? super T> mapping);
     public abstract Maybe<T> filter(Predicate<? super T> mapping);
+    
+    @Deprecated()
+    public final T get() {
+        return otherwiseThrow(new NullPointerException());
+    }
+    
+    @Deprecated()
+    public final boolean isEmpty() {
+        return !isKnown();
+    }
 
     public static <T> Maybe<T> unknown() {
         return new UnknownValue<T>();
@@ -58,6 +69,11 @@ public abstract class Maybe<T> implements Iterable<T> {
 
         @Override
         public <U> Maybe<U> transform(Function<? super T, ? extends U> mapping) {
+            return unknown();
+        }
+
+        @Override
+        public <U> Maybe<U> bind(Function<? super T, Maybe<? extends U>> mapping) {
             return unknown();
         }
 
@@ -121,6 +137,12 @@ public abstract class Maybe<T> implements Iterable<T> {
         @Override
         public <U> Maybe<U> transform(Function<? super T, ? extends U> mapping) {
             return definitely((U)mapping.apply(theValue));
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <U> Maybe<U> bind(Function<? super T, Maybe<? extends U>> mapping) {
+            return (Maybe<U>)mapping.apply(theValue);
         }
 
         @Override
