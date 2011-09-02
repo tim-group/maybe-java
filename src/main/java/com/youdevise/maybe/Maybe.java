@@ -17,6 +17,10 @@ public abstract class Maybe<T> implements Iterable<T> {
         return new UnknownValue<T>();
     }
     
+    public static <T> Maybe<T> unknown(Class<T> type) {
+        return new UnknownValue<T>();
+    }
+    
     public static <T> Maybe<T> definitely(final T theValue) {
         return new DefiniteValue<T>(theValue);
     }
