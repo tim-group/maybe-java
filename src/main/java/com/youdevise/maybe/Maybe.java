@@ -9,27 +9,28 @@ import java.util.Iterator;
 public abstract class Maybe<T> implements Iterable<T> {
     public abstract boolean isKnown();
     public abstract T otherwise(T defaultValue);
+    public abstract T otherwiseThrow(RuntimeException exception);
     public abstract Maybe<T> otherwise(Maybe<T> maybeDefaultValue);
     public abstract <U> Maybe<U> transform(Function<? super T, ? extends U> mapping);
     public abstract Maybe<Boolean> query(Predicate<? super T> mapping);
     public abstract Maybe<T> filter(Predicate<? super T> mapping);
-    
+
     public static <T> Maybe<T> unknown() {
         return new UnknownValue<T>();
     }
-    
+
     public static <T> Maybe<T> unknown(Class<T> type) {
         return new UnknownValue<T>();
     }
-    
+
     public static <T> Maybe<T> definitely(final T theValue) {
         return new DefiniteValue<T>(theValue);
     }
-    
+
     public static <T> Maybe<T> maybe(final T theValue) {
         return (theValue == null) ? Maybe.<T>unknown() : definitely(theValue);
     }
-    
+
     private static final class UnknownValue<T> extends Maybe<T> {
         @Override
         public boolean isKnown() {
@@ -46,6 +47,11 @@ public abstract class Maybe<T> implements Iterable<T> {
         }
 
         @Override
+        public T otherwiseThrow(RuntimeException exception) {
+            throw exception;
+        }
+
+        @Override
         public Maybe<T> otherwise(Maybe<T> maybeDefaultValue) {
             return maybeDefaultValue;
         }
@@ -59,7 +65,7 @@ public abstract class Maybe<T> implements Iterable<T> {
         public Maybe<Boolean> query(Predicate<? super T> mapping) {
             return unknown();
         }
-        
+
         @Override
         public Maybe<T> filter(Predicate<? super T> mapping) {
             return this;
@@ -99,6 +105,11 @@ public abstract class Maybe<T> implements Iterable<T> {
 
         @Override
         public T otherwise(T defaultValue) {
+            return theValue;
+        }
+
+        @Override
+        public T otherwiseThrow(RuntimeException exception) {
             return theValue;
         }
 
