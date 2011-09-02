@@ -102,12 +102,11 @@ public class MaybeTest {
         }
     }
 
-    @SuppressWarnings({"UnusedDeclaration"})
     @Test
     public void ifElse() throws Exception {
         Maybe<String> foo = unknown();
 
-        if (foo.isKnown()) for (String s : foo) {
+        if (foo.isKnown()) for (@SuppressWarnings("unused") String s : foo) {
             fail("should not have been called");
         }
         else {
