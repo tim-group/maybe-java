@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="output" path="bin"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER" exported="true"/>
-	<classpathentry kind="lib" path="GRADLE_CACHE/com.google.guava/guava/jars/guava-r06.jar" sourcepath="GRADLE_CACHE/guava/sources/guava-r06-sources.jar" exported="true"/>
-	<classpathentry kind="lib" path="GRADLE_CACHE/junit/junit-dep/jars/junit-dep-4.9.jar" sourcepath="GRADLE_CACHE/junit/junit-dep/sources/junit-dep-4.9-sources.jar" exported="true"/>
-	<classpathentry kind="lib" path="GRADLE_CACHE/org.hamcrest/hamcrest-all/jars/hamcrest-all-1.2.jar" exported="true"/>
+	<classpathentry kind="var" path="GRADLE_CACHE/com.google.guava/guava/jars/guava-r06.jar" sourcepath="GRADLE_CACHE/guava/sources/guava-r06-sources.jar" exported="true"/>
+	<classpathentry kind="var" path="GRADLE_CACHE/junit/junit-dep/jars/junit-dep-4.9.jar" sourcepath="GRADLE_CACHE/junit/junit-dep/sources/junit-dep-4.9-sources.jar" exported="true"/>
+	<classpathentry kind="var" path="GRADLE_CACHE/org.hamcrest/hamcrest-all/jars/hamcrest-all-1.2.jar" exported="true"/>
 </classpath>
