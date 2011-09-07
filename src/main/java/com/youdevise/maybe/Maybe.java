@@ -1,4 +1,20 @@
+/*
+ * Copyright 2010 Nat Pryce
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.youdevise.maybe;
+
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -20,12 +36,12 @@ public abstract class Maybe<T> implements Iterable<T> {
         return !isKnown();
     }
 
-    public static <T> Maybe<T> unknown() {
-        return new UnknownValue<T>();
+    public static <T> Maybe<T> nothing() {
+        return new AbsentValue<T>();
     }
 
-    public static <T> Maybe<T> unknown(Class<T> type) {
-        return new UnknownValue<T>();
+    public static <T> Maybe<T> theAbsenceOfA(@SuppressWarnings("unused") Class<T> type) {
+        return new AbsentValue<T>();
     }
 
     public static <T> Maybe<T> definitely(final T theValue) {
@@ -33,10 +49,10 @@ public abstract class Maybe<T> implements Iterable<T> {
     }
 
     public static <T> Maybe<T> maybe(final T theValue) {
-        return (theValue == null) ? Maybe.<T>unknown() : definitely(theValue);
+        return (theValue == null) ? Maybe.<T>nothing() : definitely(theValue);
     }
 
-    private static final class UnknownValue<T> extends Maybe<T> {
+    private static final class AbsentValue<T> extends Maybe<T> {
         @Override
         public boolean isKnown() {
             return false;
@@ -63,17 +79,17 @@ public abstract class Maybe<T> implements Iterable<T> {
 
         @Override
         public <U> Maybe<U> transform(Function<? super T, ? extends U> mapping) {
-            return unknown();
+            return nothing();
         }
 
         @Override
         public <U> Maybe<U> bind(Function<? super T, Maybe<? extends U>> mapping) {
-            return unknown();
+            return nothing();
         }
 
         @Override
         public Maybe<Boolean> query(Predicate<? super T> mapping) {
-            return unknown();
+            return nothing();
         }
 
         @Override
@@ -88,7 +104,7 @@ public abstract class Maybe<T> implements Iterable<T> {
 
         @Override
         public boolean equals(Object obj) {
-            return (obj instanceof UnknownValue);
+            return obj instanceof AbsentValue;
         }
 
         @Override
@@ -101,6 +117,9 @@ public abstract class Maybe<T> implements Iterable<T> {
         private final T theValue;
 
         public DefiniteValue(T theValue) {
+            if (null == theValue) {
+                throw new IllegalArgumentException("Cannot have a definite value that is null");
+            }
             this.theValue = theValue;
         }
 
@@ -146,7 +165,7 @@ public abstract class Maybe<T> implements Iterable<T> {
 
         @Override
         public Maybe<T> filter(Predicate<? super T> mapping) {
-            return mapping.apply(theValue) ? this : Maybe.<T>unknown();
+            return mapping.apply(theValue) ? this : Maybe.<T>nothing();
         }
 
         @Override

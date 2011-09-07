@@ -1,3 +1,18 @@
+/*
+ * Copyright 2010 Nat Pryce
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.youdevise.maybe;
 
 import com.google.common.base.Function;
@@ -5,7 +20,7 @@ import com.google.common.base.Predicate;
 import com.youdevise.maybe.Maybe;
 
 import static com.youdevise.maybe.Maybe.definitely;
-import static com.youdevise.maybe.Maybe.unknown;
+import static com.youdevise.maybe.Maybe.nothing;
 
 import org.junit.Test;
 
@@ -30,7 +45,7 @@ public class MaybeTest {
         }
 
         public Customer() {
-            this.emailAddress = Maybe.unknown();
+            this.emailAddress = Maybe.nothing();
         }
 
         public Maybe<String> emailAddress() {
@@ -38,6 +53,11 @@ public class MaybeTest {
         }
     }
 
+    @Test(expected=IllegalArgumentException.class) public void
+    cannotHaveADefiniteNothing() {
+        Maybe.definitely(null);
+    }
+    
     @Test
     public void equalsOfKnownValues() throws Exception {
         assertThat(definitely(1), equalTo(definitely(1)));
@@ -46,19 +66,19 @@ public class MaybeTest {
 
     @Test
     public void unknownValuesAreEqual() throws Exception {
-        assertThat(unknown(), equalTo(unknown()));
+        assertThat(nothing(), equalTo(nothing()));
 
-        Maybe<Object> u = unknown();
+        Maybe<Object> u = nothing();
         assertThat(u, equalTo(u));
     }
 
     @Test
     public void anUnknownThingIsNeverEqualToAKnownThing() throws Exception {
-        assertThat(Maybe.<Integer>unknown(), not(equalTo(definitely(1))));
-        assertThat(Maybe.<String>unknown(), not(equalTo(definitely("rumsfeld"))));
+        assertThat(Maybe.<Integer>nothing(), not(equalTo(definitely(1))));
+        assertThat(Maybe.<String>nothing(), not(equalTo(definitely("rumsfeld"))));
 
-        assertThat(definitely(1), not(equalTo(Maybe.<Integer>unknown())));
-        assertThat(definitely("rumsfeld"), not(equalTo(Maybe.<String>unknown())));
+        assertThat(definitely(1), not(equalTo(Maybe.<Integer>nothing())));
+        assertThat(definitely("rumsfeld"), not(equalTo(Maybe.<String>nothing())));
     }
 
     @Test
@@ -87,7 +107,7 @@ public class MaybeTest {
         assertThat(definitely("example@example.com").query(isValidEmailAddress), equalTo(definitely(true)));
         assertThat(definitely("invalid-email-address").query(isValidEmailAddress), equalTo(definitely(false)));
 
-        assertThat(Maybe.<String>unknown().query(isValidEmailAddress).isKnown(), equalTo(false));
+        assertThat(Maybe.<String>nothing().query(isValidEmailAddress).isKnown(), equalTo(false));
     }
 
     @Test
@@ -104,7 +124,7 @@ public class MaybeTest {
 
     @Test
     public void ifElse() throws Exception {
-        Maybe<String> foo = unknown();
+        Maybe<String> foo = nothing();
 
         if (foo.isKnown()) for (@SuppressWarnings("unused") String s : foo) {
             fail("should not have been called");
@@ -125,7 +145,7 @@ public class MaybeTest {
         );
 
         Set<String> emailAddresses = newHashSet(
-                concat(transform(customers, emailAddress)));
+                concat(transform(customers, toEmailAddress)));
 
         assertThat(emailAddresses, equalTo((Set<String>) newHashSet(
                 "alice@example.com",
@@ -134,26 +154,25 @@ public class MaybeTest {
     }
 
 
-    static final Function<Customer, Maybe<String>> emailAddress = new Function<Customer, Maybe<String>>() {
+    private static final Function<Customer, Maybe<String>> toEmailAddress = new Function<Customer, Maybe<String>>() {
         public Maybe<String> apply(Customer c) {
             return c.emailAddress();
         }
     };
 
-    static final Predicate<String> isValidEmailAddress = new Predicate<String>() {
+    private static final Predicate<String> isValidEmailAddress = new Predicate<String>() {
         public boolean apply(String input) {
             return input.contains("@");
         }
     };
 
-    static final Function<String, String> toUpperCase = new Function<String, String>() {
+    private static final Function<String, String> toUpperCase = new Function<String, String>() {
         public String apply(String from) {
             return from.toUpperCase();
         }
     };
 
     private Maybe<String> noString() {
-        return unknown();
+        return nothing();
     }
-
 }
