@@ -15,32 +15,48 @@
  */
 package com.youdevise.maybe;
 
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Iterator;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+
 public abstract class Maybe<T> implements Iterable<T> {
+
     public abstract boolean isKnown();
-    public abstract T otherwise(T defaultValue);
-    public abstract T otherwiseThrow(RuntimeException exception);
+    public abstract T otherwise(Supplier<T> defaultValueSupplier);
+    public abstract <E extends Throwable> T otherwiseThrow(Supplier<E> exceptionSupplier) throws E;
     public abstract Maybe<T> otherwise(Maybe<T> maybeDefaultValue);
     public abstract <U> Maybe<U> transform(Function<? super T, ? extends U> mapping);
     public abstract <U> Maybe<U> bind(Function<? super T, Maybe<? extends U>> mapping);
     public abstract Maybe<Boolean> query(Predicate<? super T> mapping);
     public abstract Maybe<T> filter(Predicate<? super T> mapping);
-    
+
     public final boolean isEmpty() {
         return !isKnown();
+    }
+
+    public final T otherwise(T defaultValue) {
+        return otherwise(Suppliers.ofInstance(defaultValue));
+    }
+
+    public final <E extends Throwable> T otherwiseThrow(final Class<E> exceptionClass) throws E {
+        return otherwiseThrow(ExceptionSuppliers.of(exceptionClass));
+    }
+
+    public final <E extends Throwable> T otherwiseThrow(final Class<E> exceptionClass, final String message) throws E {
+        return otherwiseThrow(ExceptionSuppliers.of(exceptionClass, message));
     }
 
     public static <T> Maybe<T> nothing() {
         return new AbsentValue<T>();
     }
 
-    public static <T> Maybe<T> theAbsenceOfA(@SuppressWarnings("unused") Class<T> type) {
+    public static <T> Maybe<T> theAbsenceOfA(Class<T> type) {
         return new AbsentValue<T>();
     }
 
@@ -50,6 +66,18 @@ public abstract class Maybe<T> implements Iterable<T> {
 
     public static <T> Maybe<T> maybe(final T theValue) {
         return (theValue == null) ? Maybe.<T>nothing() : definitely(theValue);
+    }
+
+    public static <T> Predicate<Maybe<T>> known() {
+        return new Predicate<Maybe<T>>() {
+            public boolean apply(Maybe<T> input) {
+                return input.isKnown();
+            }
+        };
+    }
+    
+    public static <T> Predicate<Maybe<T>> knownToBeA(Class<T> type) {
+        return known();
     }
 
     private static final class AbsentValue<T> extends Maybe<T> {
@@ -63,13 +91,13 @@ public abstract class Maybe<T> implements Iterable<T> {
         }
 
         @Override
-        public T otherwise(T defaultValue) {
-            return defaultValue;
+        public T otherwise(Supplier<T> defaultValueSupplier) {
+            return defaultValueSupplier.get();
         }
 
         @Override
-        public T otherwiseThrow(RuntimeException exception) {
-            throw exception;
+        public <E extends Throwable> T otherwiseThrow(Supplier<E> exceptionSupplier) throws E {
+            throw exceptionSupplier.get();
         }
 
         @Override
@@ -133,12 +161,12 @@ public abstract class Maybe<T> implements Iterable<T> {
         }
 
         @Override
-        public T otherwise(T defaultValue) {
+        public T otherwise(Supplier<T> defaultValueSupplier) {
             return theValue;
         }
 
         @Override
-        public T otherwiseThrow(RuntimeException exception) {
+        public <E extends Throwable> T otherwiseThrow(Supplier<E> exception) throws E {
             return theValue;
         }
 
@@ -149,7 +177,7 @@ public abstract class Maybe<T> implements Iterable<T> {
 
         @Override
         public <U> Maybe<U> transform(Function<? super T, ? extends U> mapping) {
-            return definitely((U)mapping.apply(theValue));
+            return maybe((U)mapping.apply(theValue));
         }
 
         @SuppressWarnings("unchecked")
@@ -160,7 +188,7 @@ public abstract class Maybe<T> implements Iterable<T> {
 
         @Override
         public Maybe<Boolean> query(Predicate<? super T> mapping) {
-            return definitely(mapping.apply(theValue));
+            return maybe(mapping.apply(theValue));
         }
 
         @Override
@@ -182,13 +210,51 @@ public abstract class Maybe<T> implements Iterable<T> {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-
+            
             return theValue.equals(((DefiniteValue<?>)o).theValue);
         }
 
         @Override
         public int hashCode() {
             return theValue.hashCode();
+        }
+    }
+
+    private static final class ExceptionSuppliers {
+
+        private static <E extends Throwable> Supplier<E> of(final Class<E> exceptionClass) {
+            return of(exceptionClass, null);
+        }
+
+        private static <E extends Throwable> Supplier<E> of(final Class<E> exceptionClass, final String message) {
+            try {
+                return (message == null) ? of(exceptionClass.getConstructor())
+                                         : of(exceptionClass.getConstructor(String.class), message);
+            } catch (SecurityException e) {
+                throw new IllegalStateException("Unable to instantiate exception of class " + exceptionClass, e);
+            } catch (NoSuchMethodException e) {
+                throw new IllegalStateException("Unable to instantiate exception of class " + exceptionClass, e);
+            }
+        }
+
+        private static <E extends Throwable> Supplier<E> of(final Constructor<E> constructor, final Object... args) {
+            return new Supplier<E>() {
+                public E get() {
+                    try {
+                        return constructor.newInstance(args);
+                    } catch (InstantiationException e) {
+                        throw new IllegalStateException("Unable to instantiate exception class ", e);
+                    } catch (IllegalAccessException e) {
+                        throw new IllegalStateException("Unable to instantiate exception class ", e);
+                    } catch (IllegalArgumentException e) {
+                        throw new IllegalStateException("Unable to instantiate exception class ", e);
+                    } catch (SecurityException e) {
+                        throw new IllegalStateException("Unable to instantiate exception class ", e);
+                    } catch (InvocationTargetException e) {
+                        throw new IllegalStateException("Unable to instantiate exception class ", e);
+                    }
+                }
+            };
         }
     }
 }

@@ -17,23 +17,21 @@ package com.youdevise.maybe;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.youdevise.maybe.Maybe;
-
-import static com.youdevise.maybe.Maybe.definitely;
-import static com.youdevise.maybe.Maybe.nothing;
-
-import org.junit.Test;
 
 import java.util.List;
 import java.util.Set;
+
+import org.junit.Test;
 
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.youdevise.maybe.Maybe.definitely;
+import static com.youdevise.maybe.Maybe.nothing;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 public class MaybeTest {
@@ -153,6 +151,21 @@ public class MaybeTest {
                 "alice@example.com")));
     }
 
+    @Test(expected=IllegalStateException.class)
+    public void otherwiseThrow() {
+        Maybe.nothing().otherwiseThrow(IllegalStateException.class);
+    }
+
+    @Test
+    public void otherwiseThrowWithMessage() {
+        try {
+            Maybe.nothing().otherwiseThrow(IllegalStateException.class, "myMessage");
+            fail("expected IllegalStateException");
+        }
+        catch (IllegalStateException e) {
+            assertThat(e.getMessage(), equalTo("myMessage"));
+        }
+    }
 
     private static final Function<Customer, Maybe<String>> toEmailAddress = new Function<Customer, Maybe<String>>() {
         public Maybe<String> apply(Customer c) {
