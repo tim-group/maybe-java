@@ -3,3 +3,6 @@ out
 bin
 build
 .gradle
+.settings/
+.classpath
+.project
