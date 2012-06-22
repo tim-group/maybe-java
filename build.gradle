@@ -5,8 +5,8 @@ apply plugin: 'eclipse'
 defaultTasks 'clean', 'test', 'jar'
 
 group = 'com.youdevise'
-targetCompatibility = 1.6
-version = '1.0.5'
+targetCompatibility = 1.5
+version = '1.0.6'
 
 repositories {
     mavenCentral()
