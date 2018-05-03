@@ -29,8 +29,8 @@ public abstract class Maybe<T> implements Iterable<T> {
 
     public abstract boolean isKnown();
     public abstract T otherwise(Supplier<T> defaultValueSupplier);
-    public abstract <E extends Throwable> T otherwiseThrow(Supplier<E> exceptionSupplier) throws E;
-    public abstract Maybe<T> otherwise(Maybe<T> maybeDefaultValue);
+    public abstract <E extends Throwable> T otherwiseThrow(Supplier<? extends E> exceptionSupplier) throws E;
+    public abstract Maybe<T> otherwise(Maybe<? extends T> maybeDefaultValue);
     public abstract <U> Maybe<U> transform(Function<? super T, ? extends U> mapping);
     public abstract <U> Maybe<U> bind(Function<? super T, Maybe<? extends U>> mapping);
     public abstract Maybe<Boolean> query(Predicate<? super T> mapping);
@@ -96,13 +96,14 @@ public abstract class Maybe<T> implements Iterable<T> {
         }
 
         @Override
-        public <E extends Throwable> T otherwiseThrow(Supplier<E> exceptionSupplier) throws E {
+        public <E extends Throwable> T otherwiseThrow(Supplier<? extends E> exceptionSupplier) throws E {
             throw exceptionSupplier.get();
         }
 
+        @SuppressWarnings("unchecked")
         @Override
-        public Maybe<T> otherwise(Maybe<T> maybeDefaultValue) {
-            return maybeDefaultValue;
+        public Maybe<T> otherwise(Maybe<? extends T> maybeDefaultValue) {
+            return (Maybe<T>) maybeDefaultValue;
         }
 
         @Override
@@ -166,12 +167,12 @@ public abstract class Maybe<T> implements Iterable<T> {
         }
 
         @Override
-        public <E extends Throwable> T otherwiseThrow(Supplier<E> exception) throws E {
+        public <E extends Throwable> T otherwiseThrow(Supplier<? extends E> exception) throws E {
             return theValue;
         }
 
         @Override
-        public Maybe<T> otherwise(Maybe<T> maybeDefaultValue) {
+        public Maybe<T> otherwise(Maybe<? extends T> maybeDefaultValue) {
             return this;
         }
 
