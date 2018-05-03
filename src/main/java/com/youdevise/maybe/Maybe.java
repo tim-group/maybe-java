@@ -26,7 +26,6 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
 public abstract class Maybe<T> implements Iterable<T> {
-
     public abstract boolean isKnown();
     public abstract T otherwise(Supplier<T> defaultValueSupplier);
     public abstract <E extends Throwable> T otherwiseThrow(Supplier<? extends E> exceptionSupplier) throws E;
@@ -52,12 +51,14 @@ public abstract class Maybe<T> implements Iterable<T> {
         return otherwiseThrow(ExceptionSuppliers.of(exceptionClass, message));
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> Maybe<T> nothing() {
-        return new AbsentValue<T>();
+        return (Maybe<T>) AbsentValue.INSTANCE;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> Maybe<T> theAbsenceOfA(Class<T> type) {
-        return new AbsentValue<T>();
+        return (Maybe<T>) AbsentValue.INSTANCE;
     }
 
     public static <T> Maybe<T> definitely(final T theValue) {
@@ -81,6 +82,11 @@ public abstract class Maybe<T> implements Iterable<T> {
     }
 
     private static final class AbsentValue<T> extends Maybe<T> {
+        private static final Maybe<?> INSTANCE = new AbsentValue<Object>();
+
+        private AbsentValue() {
+        }
+
         @Override
         public boolean isKnown() {
             return false;
