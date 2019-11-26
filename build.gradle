@@ -1,13 +1,38 @@
 plugins {
     id "java-library"
+    id "maven-publish"
 }
 
-group = 'com.youdevise'
-sourceCompatibility = 1.6
-version = '1.0.7'
+ext {
+    buildNumber = System.getenv("BUILD_NUMBER")
+}
+
+group = "com.youdevise"
+if (buildNumber) version = "1.0.$buildNumber"
+
+tasks.withType(Jar).all {
+    manifest {
+        attributes(
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Implementation-Vendor': 'TIM Group Ltd'
+        )
+    }
+}
+
+tasks.withType(JavaCompile).all {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+    options.encoding = "UTF-8"
+    options.deprecation = true
+    options.compilerArgs << "-parameters"
+    options.compilerArgs << "-Xlint:unchecked"
+}
 
 repositories {
-    mavenCentral()
+    maven {
+        url = "$repoUrl/groups/public"
+    }
 }
 
 dependencies {
@@ -17,8 +42,34 @@ dependencies {
 }
 
 task sourcesJar(type: Jar, dependsOn:classes) {
-     classifier = 'sources'
+     archiveClassifier = 'sources'
      from sourceSets.main.allSource
 }
 
 assemble.dependsOn(sourcesJar)
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+assemble.dependsOn(javadocJar)
+
+publishing {
+    repositories {
+        maven {
+            url = "$repoUrl/repositories/yd-release-candidates"
+            credentials {
+                username = project.repoUsername
+                password = project.repoPassword
+            }
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact(sourcesJar)
+            artifact(javadocJar)
+        }
+    }
+}
